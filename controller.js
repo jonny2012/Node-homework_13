@@ -1,4 +1,5 @@
-import { Publisher, Magazine } from "./models.js";
+import { Publisher, Magazine, Tag, Article } from "./models.js";
+import mongoose from "mongoose";
 
 class Controller {
   async createPublisher(req, res) {
@@ -37,12 +38,12 @@ class Controller {
     try {
       const body = req.body;
 
-      const publisher = await  Publisher.findById(body.publisher)
+      const publisher = await Publisher.findById(body.publisher);
       const createdMagazine = await Magazine.create({
         title: body.title,
         issueNumber: body.issueNumber,
-        publisher:publisher
-      })
+        publisher: publisher,
+      });
       res.json(createdMagazine);
     } catch (err) {
       console.log(err.message);
@@ -54,56 +55,89 @@ class Controller {
       const magazines = await Magazine.find().populate("publisher");
       res.json(magazines);
     } catch (err) {
-      console.log(err.message)
+      console.log(err.message);
     }
   }
 
   async getByIdMagazine(req, res) {
     try {
       const { id } = req.params;
-      const magazine = await Magazine.findById(id);
+      const magazine = await Magazine.findById(id).populate("publisher");
+      console.log(magazine);
       res.json(magazine);
     } catch (err) {
       console.log(err.message);
     }
   }
-
 
   async createTag(req, res) {
     try {
       const body = req.body;
-
-      const publisher = await  Publisher.findById(body.publisher)
-      const createdMagazine = await Magazine.create({
-        title: body.title,
-        issueNumber: body.issueNumber,
-        publisher:{publisher}
-      })
-      res.json(createdMagazine);
+      const createdTag = await Tag.create({
+        name: body.name,
+      });
+      res.json(createdTag);
     } catch (err) {
       console.log(err.message);
     }
   }
-
-  async getAllMagazines(req, res) {
+  async getAllTags(req, res) {
     try {
-      const magazines = await Magazine.find();
-      res.json(magazines);
+      const Tags = await Tag.find();
+      res.json(Tags);
     } catch (err) {
       console.log(err.message);
     }
   }
 
-  async getByIdMagazine(req, res) {
+  async getByIdTag(req, res) {
     try {
       const { id } = req.params;
-      const magazine = await Magazine.findById(id);
-      res.json(magazine);
+      const Tag = await Tag.findById(id);
+      res.json(Tag);
     } catch (err) {
       console.log(err.message);
     }
   }
 
+  async createArticle(req, res) {
+    try {
+      const article = req.body;
+    
+      const createdArticle = await Article.create({
+        title:article.title,
+        content:article.content,
+        tags:article.tags
+      });
+      await Tag.updateMany(
+
+        { _id: createdArticle.tags },
+        { $push: { articles: createdArticle._id } }
+
+      );
+      res.json(createdArticle);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async getAllArticles(req, res) {
+    try {
+      const Articles = await Article.find().populate('tags')
+      res.json(Articles);
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+  async getByIdArticle(req, res) {
+    try {
+      const { id } = req.params;
+      const Article = await Article.findById(id).populate("tags");
+      res.json(Article);
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
 }
 
-export default new Controller()
+export default new Controller();

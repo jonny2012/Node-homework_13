@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const PublisherSchema = new mongoose.Schema({
-  name:{type: String, unique:true},
+  name: { type: String, unique: true },
   location: String,
 });
 
@@ -10,16 +10,16 @@ const MagazineSchema = new mongoose.Schema({
   issueNumber: Number,
   publisher: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Publisher",
+    ref: "publisher",
   },
 });
 
 const TagSchema = new mongoose.Schema({
-  name: String,
+  name: { type: String },
   articles: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Article",
+      ref: "article",
     },
   ],
 });
@@ -30,15 +30,16 @@ const ArticleSchema = new mongoose.Schema({
   tags: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Tag",
+      ref: "tag",
+      
     },
   ],
 });
 
-const Publisher = mongoose.model("Publisher", PublisherSchema);
-const Magazine = mongoose.model("Magazine", MagazineSchema);
+const Publisher = mongoose.model("publisher", PublisherSchema);
+const Magazine = mongoose.model("magazine", MagazineSchema);
 
-const Tag = mongoose.model("Tag", TagSchema);
-const Article = mongoose.model("Article", ArticleSchema);
+const Tag = mongoose.model("tag", TagSchema);
+const Article = mongoose.model("article", ArticleSchema);
 
 export { Publisher, Magazine, Tag, Article };
